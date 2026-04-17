@@ -61,32 +61,44 @@ def cargar_todo():
     # ==========================================
     # 2. PROCESAMIENTO LIGA POR LIGA
     # ==========================================
-    for ruta in archivos:
+    # ==========================================
+    # 2. PROCESAMIENTO LIGA POR LIGA
+    # ==========================================
+    for ruta_original in archivos:
         try:
-            nombre_f = os.path.basename(ruta)
-            df_temp = pd.read_excel(ruta)
+            # CLAVE: Extraemos solo el nombre del archivo (ej: 'RB SPAIN 2526.xlsx')
+            # Esto ignora si antes decía C:/Users/juanf/...
+            nombre_archivo = os.path.basename(ruta_original)
             
-            # Extraemos el nombre literal del país/liga
-            liga_nombre = limpiar_nombre_liga(ruta)
-            df_temp["Liga"] = liga_nombre
-            
-            # Filtro de minutos (0 por ahora como pediste)
-            if "Minutos jugados" in df_temp.columns:
-                df_temp = df_temp[df_temp["Minutos jugados"] >= MIN_MINUTES].copy()
-            
-            # --- CLASIFICACIÓN POR TEMPORADA (SIN UNIR) ---
-            if "2526" in nombre_f:
-                df_temp["Temporada"] = "25/26"
-                list_2526.append(df_temp) # Se guarda el DF individual en la lista
-                print(f"📁 Cargado individualmente (25/26): {liga_nombre}")
-    
-            elif "2425" in nombre_f or "2025" in nombre_f:
-                df_temp["Temporada"] = "24/25_2025"
-                list_2425.append(df_temp) # Se guarda el DF individual en la lista
-                print(f"📁 Cargado individualmente (24/25): {liga_nombre}")
+            # Intentamos leer el archivo desde la carpeta raíz del repositorio
+            if os.path.exists(nombre_archivo):
+                df_temp = pd.read_excel(nombre_archivo)
+                
+                # Extraemos el nombre literal del país/liga usando tu función
+                liga_nombre = limpiar_nombre_liga(nombre_archivo)
+                df_temp["Liga"] = liga_nombre
+                
+                # Filtro de minutos
+                if "Minutos jugados" in df_temp.columns:
+                    df_temp = df_temp[df_temp["Minutos jugados"] >= MIN_MINUTES].copy()
+                
+                # --- CLASIFICACIÓN POR TEMPORADA ---
+                if "2526" in nombre_archivo:
+                    df_temp["Temporada"] = "25/26"
+                    list_2526.append(df_temp)
+                    st.toast(f"✅ Cargado: {liga_nombre} (25/26)") # Feedback visual en Streamlit
+        
+                elif "2425" in nombre_archivo or "2025" in nombre_archivo:
+                    df_temp["Temporada"] = "24/25_2025"
+                    list_2425.append(df_temp)
+                    st.toast(f"✅ Cargado: {liga_nombre} (24/25)")
+
+            else:
+                # Si no existe en el repo, te avisará en rojo en la web
+                st.error(f"❌ No se encontró en GitHub: {nombre_archivo}")
     
         except Exception as e:
-            print(f"❌ Error con {os.path.basename(ruta)}: {e}")
+            st.error(f"❌ Error procesando {nombre_archivo}: {e}")
     
     # ==========================================
     # 3. VERIFICACIÓN
