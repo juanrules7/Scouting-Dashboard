@@ -576,33 +576,81 @@ import seaborn as sns
 from mplsoccer import Radar
 from sklearn.metrics.pairwise import cosine_similarity
 
+from mplsoccer import Radar
+import matplotlib.pyplot as plt
+import numpy as np
+
 def plot_omni_radar_evolutivo(players_list):
+    """
+    Versión Final: Sigue estrictamente el diseño de referencia para 1, 2 o 3 jugadores.
+    """
     extracted_data, labels = [], []
+    
+    # 1. Extraer datos (maneja hasta 3 jugadores)
     for name, df, label in players_list:
         try:
             row = df[df['Jugador'] == name].iloc[0]
             extracted_data.append(row)
             labels.append(label)
-        except: continue
-    if not extracted_data: return None
+        except (IndexError, KeyError):
+            continue
+            
+    if not extracted_data:
+        return None
 
+    # 2. Configurar Pilares
     pilares_cols = [c for c in extracted_data[0].index if '_Rating' in c]
     params = [c.replace('_Rating', '') for c in pilares_cols]
     values = [p[pilares_cols].values.flatten().tolist() for p in extracted_data]
     
-    radar = Radar(params, [0]*len(params), [100]*len(params), num_rings=5)
-    fig, ax = radar.setup_axis(facecolor='#ffffff')
-    radar.draw_circles(ax=ax, facecolor='#f5f5f5', edgecolor='#dddddd')
-
-    colors = ['#77BA99', '#E84855', '#3182CE']
-    for i, val in enumerate(values):
-        radar.draw_radar(ax=ax, values=val, 
-                         kwargs_radar={'facecolor': colors[i], 'alpha': 0.3, 'edgecolor': colors[i], 'lw': 2})
+    low = [0] * len(params)
+    high = [100] * len(params)
     
-    radar.draw_param_labels(ax=ax, fontsize=10, fontweight='bold')
-    for i, label in enumerate(labels):
-        fig.text(0.5, 0.98 - (i*0.03), label, size=11, color=colors[i], ha="center", fontweight='bold')
+    # Colores profesionales del diseño de referencia
+    colors = ['#77BA99', '#E84855', '#F3E03B'] # Verde, Rojo, Amarillo
+    edge_colors = ['#225533', '#991122', '#C2B11B']
+
+    # 3. Inicializar Radar
+    try:
+        radar = Radar(params, low, high, round_int=[False]*len(params), num_rings=5, center_circle_radius=1)
+    except TypeError:
+        radar = Radar(params, low, high, num_rings=5, center_circle_radius=1)
+
+    fig, ax = radar.setup_axis()
+    radar.draw_circles(ax=ax, facecolor='#f5f5f5', edgecolor='#dddddd', zorder=1)
+
+    # 4. Dibujar Radares (con el estilo exacto de kwargs)
+    for i, (val, color, edge) in enumerate(zip(values, colors, edge_colors)):
+        radar.draw_radar(ax=ax, values=val, 
+                         kwargs_radar={'facecolor': color, 'alpha': 0.4, 'edgecolor': edge, 'lw': 2},
+                         kwargs_rings={'facecolor': color, 'alpha': 0.1})
+    
+    # Etiquetas con tipografía monospace
+    radar.draw_range_labels(ax=ax, fontsize=9, fontproperties="monospace", zorder=12)
+    radar.draw_param_labels(ax=ax, fontsize=11, fontproperties="monospace", fontweight='bold', zorder=12)
+
+    # 5. Título Dinámico con el espaciado solicitado
+    # Usamos las etiquetas (labels) que vienen del app.py
+    if len(labels) == 1:
+        fig.text(0.5, 0.95, labels[0], size=14, color=colors[0], ha="center", fontweight='bold')
+    elif len(labels) == 2:
+        fig.text(0.45, 0.95, labels[0], size=14, color=colors[0], ha="right", fontweight='bold')
+        fig.text(0.5, 0.95, " vs", size=14, color="black", ha="center")
+        fig.text(0.55, 0.95, labels[1], size=14, color=colors[1], ha="left", fontweight='bold')
+    elif len(labels) >= 3:
+        fig.text(0.35, 0.95, labels[0], size=14, color=colors[0], ha="right", fontweight='bold')
+        fig.text(0.4, 0.95, " vs", size=14, color="black", ha="center")
+        fig.text(0.50, 0.95, labels[1], size=14, color=colors[1], ha="center", fontweight='bold')
+        fig.text(0.6, 0.95, " vs ", size=14, color="black", ha="center")
+        fig.text(0.65, 0.95, labels[2], size=14, color=colors[2], ha="left", fontweight='bold')
+
+    # Créditos y nota metodológica inferior
+    ax.text(0.0, -0.1, 
+            'Ratings: Percentile-based (0-100)\nAdjusted by Team Possession & League ELO', 
+            fontsize=9, ha='left', va='center', transform=ax.transAxes, fontfamily='monospace', color='#555555')
+
     return fig
+
 
 import pandas as pd
 
