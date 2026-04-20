@@ -170,7 +170,7 @@ with tab1:
 
 # --- TAB 2: LEAGUE RANKINGS ---
 with tab2:
-    st.header("🏆 League Context")
+    st.header("🏆 League Rankings")
     with st.expander("ℹ️ About League Ranking"):
         st.write("This chart shows exactly where the player sits relative to every other player in their specific league and position.")
     
@@ -224,7 +224,7 @@ with tab3:
 
 # --- TAB 4: ADVANCED SEARCH ---
 with tab4:
-    st.header("🔍 Advanced Filters")
+    st.header("🔍 Advanced Search")
     with st.expander("ℹ️ About the Search Engine"):
         st.write("Set minimum requirements. The sliders represent **Percentiles (0-100)**. A value of 80 means the player must be in the top 20% for that metric.")
 
@@ -283,7 +283,7 @@ with tab4:
 
 # --- TAB 5: SIMILARITY ---
 with tab5:
-    st.header("👯‍♂️ Similarity (Twin Finder)")
+    st.header("👯‍♂️ Similarity")
     with st.expander("ℹ️ How Similarity works"):
         st.write("Calculates the cosine similarity between players. This finds players who share a similar profile regardless of league or age.")
 
@@ -337,7 +337,7 @@ with tab6:
 
 # --- TAB 7: MARKET ---
 with tab7:
-    st.header("🌍 Elite Market Benchmarking")
+    st.header("🌍 Market Benchmarking")
     with st.expander("ℹ️ How to use the Market Plot"):
         st.write("Compares your player (Yellow Star) against others in his position in those specific metrics. It helps determine how good a player is in the combination of a number of metrics.")
 
