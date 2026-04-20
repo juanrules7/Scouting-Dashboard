@@ -705,6 +705,11 @@ def plot_similar_players_cross_st(player_name, df_origen, df_destino, top_n=10):
         
         plt.tight_layout()
         return fig
+
+    except Exception as e:
+        # This will print the error in your terminal/console
+        print(f"Similarity Error: {e}")
+        return None
 def plot_zscore_st(lista_jugadores, titulo="Comparativa Z-Score"):
     player_data_list, pilares_cols = [], []
     for nombre, df_origen in lista_jugadores:
