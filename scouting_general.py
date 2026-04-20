@@ -16,28 +16,12 @@ def cargar_todo():
         "RB GERMANY 2526 24-03-26.xlsx",   
         "RB ITALY 2526 24-03-26.xlsx",   
         "RB SPAIN 2526 24-03-26.xlsx",   
-        "RB ENGLAND 2 2526 24-03-26.xlsx",   
-        "RB PORTUGAL 2526 24-03-26.xlsx",   
-        "RB DENMARK 2526 24-03-26.xlsx",   
-        "RB NETHERLANDS 2526 24-03-26.xlsx",   
-        "RB SPAIN 2 2526 24-03-26.xlsx",   
-        "RB SWITZERLAND 2526 24-03-26.xlsx", 
         
         "RB ENGLAND 2425.xlsx",   
         "RB FRANCE 2425.xlsx",   
         "RB GERMANY 2425.xlsx",   
         "RB ITALY 2425.xlsx",   
-        "RB SPAIN 2425.xlsx",   
-        "RB ENGLAND 2 2425.xlsx",   
-        "RB PORTUGAL 2425.xlsx",   
-        "RB DENMARK 2425.xlsx",   
-        "RB NETHERLANDS 2425.xlsx",   
-        "RB SPAIN 2 2425.xlsx",   
-        "RB SWITZERLAND 2425.xlsx",   
-        "RB BRAZIL 2025.xlsx",   
-        "RB ARGENTINA 2025.xlsx",   
-        "RB USA 2025.xlsx",   
-        "RB MEXICO 2025.xlsx"   
+        "RB SPAIN 2425.xlsx",     
     ]
     
     
@@ -655,67 +639,72 @@ def aplicar_filtros_scouting_st(df_temporada, filtros):
     
     return df_res
 
+from sklearn.metrics.pairwise import cosine_similarity
+import matplotlib.pyplot as plt
+
 def plot_similar_players_cross_st(player_name, df_origen, df_destino, top_n=10):
-    # 1. Definir características
+    # 1. Define features (metrics)
     features = [c for c in df_origen.columns if "_Rating" in c]
     features = [f for f in features if f in df_destino.columns]
     
     if player_name not in df_origen['Jugador'].values:
         return None
 
-    # 2. Filtrar Destino (Top 5 Ligas)
-    # IMPORTANTE: Asegúrate de que estos nombres coincidan con tu columna 'Liga'
-    top_5 = ['Spain', 'England', 'Germany', 'Italy', 'France']
+    # 2. Filter Destination (Top 5 Leagues)
+    # We update these to match the LEAGUE_MAP used in app.py
+    top_5 = ['La Liga', 'Premier League', 'Bundesliga', 'Serie A', 'Ligue 1']
     df_destino_filt = df_destino[df_destino['Liga'].isin(top_5)].copy()
 
-    # PLAN B: Si el filtro de ligas devuelve un DF vacío, usamos el DF completo
+    # PLAN B: If Top 5 is empty (or mapping didn't match), use full database
     if df_destino_filt.empty:
         df_destino_filt = df_destino.copy()
 
-    # 3. ADN del jugador objetivo
+    # 3. Target Player "DNA"
     target_vector = df_origen[df_origen['Jugador'] == player_name][features].fillna(0).values
     
-    # 4. Matriz de candidatos
+    # 4. Candidate Matrix
     candidatos_matrix = df_destino_filt[features].fillna(0).values
     
-    # 5. Cálculo de Similitud
+    # 5. Calculation
     try:
         sim_scores_array = cosine_similarity(target_vector, candidatos_matrix)[0]
         sim_scores = sorted(list(enumerate(sim_scores_array)), key=lambda x: x[1], reverse=True)
         
-        # Filtrar al mismo jugador si aparece (mismo nombre y similitud ~1.0)
         final_sim_scores = []
         for i, score in sim_scores:
             nombre_candidato = df_destino_filt.iloc[i]['Jugador']
+            # Avoid matching the player with themselves
             if nombre_candidato == player_name and score > 0.99:
                 continue
             final_sim_scores.append((i, score))
             if len(final_sim_scores) >= top_n:
                 break
 
-        # 6. Crear Gráfico
+        # 6. Create Visual
         names = [df_destino_filt.iloc[i]['Jugador'] for i, _ in final_sim_scores]
         similarities = [score * 100 for _, score in final_sim_scores]
 
-        if not names: return None
+        if not names: 
+            return None
 
+        # Create Plot
         fig, ax = plt.subplots(figsize=(10, 6), facecolor='#ffffff')
         bars = ax.barh(names, similarities, color='#D4AF37', edgecolor='black', alpha=0.8)
-        ax.invert_yaxis()
-        ax.set_xlim(min(similarities)-2, 100)
-        ax.set_title(f"Similitud: Jugadores parecidos a {player_name}\n{titulo_extra}", fontweight='bold')
         
+        ax.invert_yaxis()
+        ax.set_xlim(max(0, min(similarities)-5), 100)
+        
+        # Fixed title (removed undefined titulo_extra)
+        ax.set_title(f"Statistical Similarity: Players similar to {player_name}", fontweight='bold', pad=20)
+        ax.set_xlabel("Similarity Percentage (%)", fontweight='bold')
+        
+        # Add labels to bars
         for bar in bars:
             ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height()/2, 
                     f'{bar.get_width():.1f}%', va='center', fontweight='bold')
         
         plt.tight_layout()
         return fig
-    except Exception as e:
-        print(f"Error en similitud: {e}")
-        return None
-    
-    return fig
 def plot_zscore_st(lista_jugadores, titulo="Comparativa Z-Score"):
     player_data_list, pilares_cols = [], []
     for nombre, df_origen in lista_jugadores:
