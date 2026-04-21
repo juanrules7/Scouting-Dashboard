@@ -120,8 +120,7 @@ if col_score in df_display.columns:
         'Jugador': 'Player', 
         'Equipo': 'Team', 
         'Edad': 'Age', 
-        'Pos_Normalizada': 'Position', 
-        col_score: 'Performance Score'
+        'Pos_Normalizada': 'Position'
     }
     
     # Filter valid columns and rename
