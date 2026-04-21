@@ -75,7 +75,7 @@ with st.expander("📖 READ FIRST: Methodology, Calibration & PAdj Logic", expan
     allowing us to compare a player’s output as if every player operated under a balanced **50% possession split**.
     """)
 
-    st.markdown("### 📊 Dual-Layered Percentiles")
+    st.markdown("### 📊 Percentile Calculation")
     st.write("""
     Beyond volume, these PAdj metrics are integrated with **success rates** to generate comprehensive percentiles. 
     This ensures that a high ranking is not merely a result of high activity, but of **high efficiency**. 
