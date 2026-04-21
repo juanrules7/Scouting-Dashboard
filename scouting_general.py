@@ -848,11 +848,11 @@ def plot_market_analysis_st(df_temporada, target_player, metrics, titulo_temp=""
     # --- Dibujar Puntos de Fondo ---
     # Veteranos (Puntos grises de image_0.png)
     ax.scatter(vets_ref[col_age], vets_ref['Combined'], 
-               color='#d3d3d3', alpha=0.4, s=60, label='Top 5 Veterans')
+               color='#d3d3d3', alpha=0.4, s=60, label='Veterans')
     
     # U23 / Prospects (Puntos azules con borde de image_0.png)
     ax.scatter(u23_ref[col_age], u23_ref['Combined'], 
-               color='#5DA5DA', alpha=0.8, s=120, edgecolor='black', lw=1.2, label='Top 5 U23 (Prospects)')
+               color='#5DA5DA', alpha=0.8, s=120, edgecolor='black', lw=1.2, label='U23')
 
     # --- Resaltar TARGET (Estrella Amarilla de image_0.png) ---
     if not df_target.empty:
@@ -876,12 +876,12 @@ def plot_market_analysis_st(df_temporada, target_player, metrics, titulo_temp=""
     # --- Líneas de Referencia (Estilo image_0.png) ---
     mean_combined = df_poblacion['Combined'].mean()
     # Línea punteada horizontal (Media Élite)
-    ax.axhline(mean_combined, color='gray', linestyle=(0, (1, 10)), lw=1.5, alpha=0.6, label='Elite Mean')
+    ax.axhline(mean_combined, color='gray', linestyle=(0, (1, 10)), lw=1.5, alpha=0.6, label='Mean')
     # Línea discontinua vertical (División Edad U23/Vets)
     ax.axvline(23.5, color='#F8BBD0', linestyle=(0, (5, 5)), lw=1.5, alpha=0.8)
     
     # --- Estética Final ---
-    ax.set_title(f'Market Positioning {titulo_temp}: {target_player} vs Élite Europea', fontsize=16, fontweight='bold', pad=30)
+    ax.set_title(f'Market Positioning {titulo_temp}: {target_player}', fontsize=16, fontweight='bold', pad=30)
     ax.set_xlabel('Age', fontsize=11, labelpad=10)
     # Nombre dinámico para el eje Y según las métricas elegidas
     nombre_metrica_y = 'Combined Rating (Ratings)'
