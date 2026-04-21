@@ -222,6 +222,7 @@ with tab3:
                     st.pyplot(fig)
 
 # --- TAB 4: ADVANCED SEARCH ---
+# --- TAB 4: ADVANCED SEARCH ---
 with tab4:
     st.header("🔍 Advanced Search")
     with st.expander("ℹ️ About the Search Engine"):
@@ -258,9 +259,11 @@ with tab4:
         ligas_disp = ["All Leagues"] + sorted(df_search['Liga'].unique().tolist())
         liga_search = st.selectbox("Search Specific League", ligas_disp)
 
-    # Search Execution
+    # --- SEARCH EXECUTION ---
     df_res = sg.aplicar_filtros_scouting_st(df_search, filtros_scouting)
+    
     if not df_res.empty:
+        # Additional static filters
         df_res = df_res[df_res['Edad'] <= max_edad_search]
         if 'Minutos' in df_res.columns:
             df_res = df_res[df_res['Minutos'] >= minutos_search]
@@ -268,13 +271,41 @@ with tab4:
             df_res = df_res[df_res['Liga'] == liga_search]
 
     st.subheader(f"✅ Results Found: {len(df_res)}")
+
     if not df_res.empty:
-        cols_con_filtro = [k for k, v in filtros_scouting.items() if v > 0]
-        cols_ver = ['Jugador', 'Equipo', 'Liga', 'Edad', 'Final_Score'] + cols_con_filtro
-        st.dataframe(df_res[cols_ver].head(50), use_container_width=True)
+        # --- DYNAMIC SORTING & VIEW ---
+        st.markdown("### 🏆 Ranking Strategy")
+        col_sort_search = st.selectbox(
+            "Sort players by specific talent:", 
+            options=metrics_search, 
+            format_func=lambda x: x.replace('_Rating', ''),
+            key="sort_selector_search"
+        )
+
+        # Prepare columns for the view (excluding Final_Score)
+        # We show the basics + all the ratings to compare
+        cols_ver = ['Jugador', 'Equipo', 'Liga', 'Edad'] + metrics_search
         
-        csv_data = df_res[cols_ver].to_csv(index=False).encode('utf-8')
-        st.download_button(label="📥 Download Scouting Report (.csv)", data=csv_data, file_name=f"report_{temp_search}.csv", mime="text/csv")
+        # Sort and limit to top 50
+        df_final_view = df_res[cols_ver].sort_values(by=col_sort_search, ascending=False).head(50)
+
+        # Render with Heatmap Styling
+        st.dataframe(
+            df_final_view.style.background_gradient(subset=metrics_search, cmap="YlGn")
+            .format({col: "{:.1f}" for col in metrics_search}),
+            use_container_width=True,
+            height=500
+        )
+        
+        # Download Button
+        csv_data = df_final_view.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Scouting Report (.csv)", 
+            data=csv_data, 
+            file_name=f"scouting_report_{temp_search}.csv", 
+            mime="text/csv",
+            use_container_width=True
+        )
     else:
         st.warning("No players found with these exact requirements. Try lowering the sliders.")
 
