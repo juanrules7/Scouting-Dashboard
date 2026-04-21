@@ -882,13 +882,13 @@ def plot_market_analysis_st(df_temporada, target_player, metrics, titulo_temp=""
     
     # --- Estética Final ---
     ax.set_title(f'Market Positioning {titulo_temp}: {target_player} vs Élite Europea', fontsize=16, fontweight='bold', pad=30)
-    ax.set_xlabel('Edad', fontsize=11, labelpad=10)
+    ax.set_xlabel('Age', fontsize=11, labelpad=10)
     # Nombre dinámico para el eje Y según las métricas elegidas
-    nombre_metrica_y = 'Métrica Combinada (Ratings)'
+    nombre_metrica_y = 'Combined Rating (Ratings)'
     if len(metrics) > 0:
         nombres_c = [m.replace('_Rating','') for m in metrics]
         nombre_metrica_y = f'{" + ".join(nombres_c)}'
-    ax.set_ylabel(f'Puntuación Combinada ({nombre_metrica_y})', fontsize=11, labelpad=10)
+    ax.set_ylabel(f'Combined Rating ({nombre_metrica_y})', fontsize=11, labelpad=10)
     
     ax.legend(loc='lower right', facecolor='white', frameon=True, fontsize=10)
     sns.despine(left=True, bottom=True)
@@ -949,7 +949,7 @@ def plot_league_rank_st(df, player_name):
                     va='center', fontweight='bold', fontsize=9)
 
         ax.set_xlim(0, 115)
-        ax.set_title(f"Rendimiento vs {liga_target}", fontsize=12, fontweight='bold')
+        ax.set_title(f"Performance vs {liga_target}", fontsize=12, fontweight='bold')
         sns.despine(left=True, bottom=True)
         return fig
     except:
