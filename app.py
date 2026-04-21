@@ -109,7 +109,7 @@ if pos_select:
     df_display = df_display[df_display["Pos_Normalizada"].isin(pos_select)]
 
 # 5. Main Dashboard Ranking
-st.subheader(f"Top Identified Players: {liga_select} ({temp_choice})")
+st.subheader(f"Identified Players: {liga_select} ({temp_choice})")
 
 col_score = "Final_Score" 
 if col_score in df_display.columns:
