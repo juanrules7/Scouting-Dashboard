@@ -81,7 +81,7 @@ with st.expander("📖 READ FIRST: Methodology, Calibration & PAdj Logic", expan
     This ensures that a high ranking is not merely a result of high activity, but of **high efficiency**. 
     For instance, a player’s crossing percentile is calculated on the marriage of his possession-adjusted volume 
     and his actual delivery accuracy. This methodology provides a much more robust 'performance ceiling' 
-    than traditional raw data.
+    than traditional raw data. The data comes from Wyscout.
     """)
 
 st.markdown("---")
