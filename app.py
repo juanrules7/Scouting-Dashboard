@@ -160,9 +160,8 @@ with tab1:
             c1.metric("Team", bio['Equipo'])
             c2.metric("League", bio['Liga'])
             c3.metric("Age", bio['Edad'])
-            c4.metric("Performance Score", f"{bio['Puntuación']:.1f}")
             
-            st.subheader("⭐ Standout Technical Virtues")
+            st.subheader("⭐ Standout Virtues")
             cv1, cv2, cv3 = st.columns(3)
             for i, (metrica, valor) in enumerate(bio['Top Virtudes']):
                 [cv1, cv2, cv3][i].info(f"**{metrica.replace('_Rating', '')}** \n\n {valor:.1f} / 100")
